@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "name": "\/Tunables\/Autonomous\/ShootFirstDelaySecs\/value",
+    "type": "double",
+    "value": 0,
+    "properties": {
+  "mutable": true,
+  "persistent": true,
+  "robust": true
+}
+  }
+]

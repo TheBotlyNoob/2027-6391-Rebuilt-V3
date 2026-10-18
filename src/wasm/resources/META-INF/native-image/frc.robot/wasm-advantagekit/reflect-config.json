@@ -1,0 +1,414 @@
+[
+  {
+    "name": "frc.robot.Robot",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$DriveMode",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.AutoRoutines",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.auto.AutoFactory",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.auto.AutoChooser",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.util.LoggedTunableNumber",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.drive.Drive",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.drive.Module",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.drive.ModuleIOSim",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.indexer.Indexer",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.indexer.Indexer$Goal",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.indexer.IndexerBeltIOSim",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.indexer.IndexerKickerIOSim",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.intake.Intake",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.intake.Intake$Goal",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.intake.Intake$DeployState",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.intake.IntakeDeployIOSim",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.intake.IntakeRollerIOSim",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.shooter.Shooter",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.shooter.Shooter$Goal",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.shooter.ShooterIOSim",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.shooter.ShooterHoodIOSim",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.vision.Vision",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.vision.VisionIOPhotonVisionSim",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.vision.VisionIO$PoseObservationType",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.littletonrobotics.junction.LoggedRobot",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.wpilib.framework.IterativeRobotBase",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.wpilib.framework.RobotBase",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "java.lang.Enum",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "java.lang.Record",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$1",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$2",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$3",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$4",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$5",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$6",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$7",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$8",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$9",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$10",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$11",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$12",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$13",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$14",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$15",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$16",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$17",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$18",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$19",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$20",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.RobotContainer$21",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.drive.GyroIOInputsAutoLogged",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.drive.GyroIO$GyroIOInputs",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.drive.ModuleIOInputsAutoLogged",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.drive.ModuleIO$ModuleIOInputs",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.indexer.IndexerBeltIOInputsAutoLogged",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.indexer.IndexerBeltIO$IndexerBeltIOInputs",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.indexer.IndexerKickerIOInputsAutoLogged",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.indexer.IndexerKickerIO$IndexerKickerIOInputs",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.indexer.SpinnersIOInputsAutoLogged",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.indexer.SpinnersIO$SpinnersIOInputs",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.intake.IntakeDeployIOInputsAutoLogged",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.intake.IntakeDeployIO$IntakeDeployIOInputs",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.intake.IntakeRollerIOInputsAutoLogged",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.intake.IntakeRollerIO$IntakeRollerIOInputs",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.shooter.ShooterIOInputsAutoLogged",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.shooter.ShooterIO$ShooterIOInputs",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.shooter.ShooterHoodIOInputsAutoLogged",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.shooter.ShooterHoodIO$ShooterHoodIOInputs",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.vision.VisionIOInputsAutoLogged",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.vision.VisionIO$VisionIOInputs",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "frc.robot.subsystems.vision.VisionIO$TargetObservation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "frc.robot.subsystems.vision.VisionIO$PoseObservation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.wpilib.math.geometry.Rotation2d",
+    "fields": [
+      {
+        "name": "struct"
+      }
+    ]
+  },
+  {
+    "name": "org.wpilib.math.geometry.Pose2d",
+    "fields": [
+      {
+        "name": "struct"
+      }
+    ]
+  },
+  {
+    "name": "org.wpilib.math.geometry.Pose3d",
+    "fields": [
+      {
+        "name": "struct"
+      }
+    ]
+  },
+  {
+    "name": "org.wpilib.math.kinematics.ChassisVelocities",
+    "fields": [
+      {
+        "name": "struct"
+      }
+    ]
+  },
+  {
+    "name": "org.wpilib.math.kinematics.SwerveModuleVelocity",
+    "fields": [
+      {
+        "name": "struct"
+      }
+    ]
+  }
+]

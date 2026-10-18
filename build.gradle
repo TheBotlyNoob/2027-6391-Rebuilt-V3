@@ -2,6 +2,7 @@ plugins {
     id "java"
     id "application"
     id "org.wpilib.GradleRIO" version "2027.0.0-alpha-7"
+    id 'org.teamvan.wasmbot' version "0.1.0"
 }
 
 java {
@@ -10,6 +11,11 @@ java {
 }
 
 def ROBOT_MAIN_CLASS = "first.Main"
+
+wasmbot {
+    mainClass.set(ROBOT_MAIN_CLASS)
+    imageName.set('rebuilt-6391')
+}
 
 // Define my targets (SystemCore) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.

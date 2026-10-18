@@ -78,6 +78,17 @@ Preserve the IO pattern: hardware access belongs in hardware IO, physics in simu
 - Explicitly document temporarily excluded integrations and runtime limitations. Do not silently replace unavailable hardware with successful-looking no-op IO.
 - Update these instructions when the migration is resolved or the toolchain changes. Keep historical speculation out of standing instructions.
 
+## WASM simulation
+
+- Resolve `org.teamvan.wasmbot` version `0.1.0` from Maven Local; publish the sibling Wasmbot build before consumer builds. Do not replace this with an included source build without a reason.
+- Keep compatibility code in `src/wasm/java` and metadata in `src/wasm/resources`; do not duplicate `Robot`, `RobotContainer`, mechanism behavior, or hardware IO. The existing `first.Main` is the WASM entry point.
+- Use GraalVM Java 25 Web Image, Binaryen, JSPI-capable Bun/browser, and an x64 MSVC developer environment. `nativeCompile`, `wasmRun`, `wasmSite`, and `advantagescope` are the consumer tasks; serve `build/wasm/site` over HTTP.
+- Host enable state and robot mode are separate. Omitted mode stays UNKNOWN. NI Xbox getters and command triggers must translate the normalized host layout without changing robot bindings or generic Gamepad behavior.
+- The user explicitly approved a no-observation WASM PhotonVision shim: disconnected camera, empty tag/pose arrays, and `Vision/Simulation/Available=false`. Desktop camera simulation remains real PhotonVision. Do not claim WASM camera validation.
+- Preserve generated AutoLog inputs, real explicit/automatic outputs, synchronous receiver delivery, nanosecond logger timestamps, and existing tuning/chooser protocols. Native Conduit/system/radio/power/GC metrics and native alert aggregation are unavailable; do not invent them. HAL replay and URCL reject use.
+- Choreo reads packaged `/wasmbot/deploy/choreo/*.traj` resources in WASM, preserving samples, forces, markers, splits, and library transforms. The 16 deploy assets remain the source of truth.
+- Reflection metadata covers the SIM object graph and private automatic outputs. Update it when those classes/members change. Report native compilation, actual CLI/browser behavior, desktop regressions, and hardware verification separately.
+
 ## Simulator regression checks
 
 With the Alpha 7 JDK selected, run `./gradlew.bat test --tests frc.robot.SimulationFunctionalTest --console=plain` for deterministic 20 ms simulation. `./gradlew.bat simulateChecks --console=plain` replays the same checks at real-time speed with the simulator GUI (a 15 s initial pause allows opening the field views). These tasks construct the actual Robot and physics IO, feed HAL driver-station/controller data, use AdvantageKit's before/after hooks, and run the normal robot lifecycle and Commands v3 scheduler on one thread. Test classes run in separate JVMs to isolate global HAL/logger/scheduler state.

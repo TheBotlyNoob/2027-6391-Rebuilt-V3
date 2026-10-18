@@ -121,6 +121,33 @@ Simulation does not model obstacles, bumps, collected game pieces, or physical s
 
 Shooter simulation converts Phoenix velocity gains from rotations/sec to radians/sec and implements FOC requests through the voltage-based motor model. Hardware torque-current limits and bang-bang transients are not modeled. A regression test verifies spin-up and stopping rather than physical shot accuracy.
 
+## WASM browser simulation
+
+The published-local `org.teamvan.wasmbot` plugin runs the existing `first.Main` and `frc.robot.Robot` in SIM. Shared robot code, command bindings, physics IO, and desktop REAL/SIM/REPLAY selection are unchanged. Compatibility sources and reflection metadata are isolated in `src/wasm/`.
+
+Use a VS Code **x64** developer terminal, GraalVM Java 25 with Web Image, Binaryen, and a JSPI-capable Bun/browser. Set `JAVA_HOME` and `GRAALVM_HOME` to that GraalVM installation. The sibling Wasmbot publication also builds its bundled frontend and requires Node/npm and Emscripten on `PATH`.
+
+Publish Wasmbot before building this consumer; `settings.gradle` resolves the plugin through Maven Local, not an included source build:
+
+```powershell
+..\wasmbot\gradlew.bat -p ..\wasmbot publishToMavenLocal -PskipDocs=true
+.\gradlew.bat nativeCompile wasmRun wasmSite advantagescope
+python -m http.server 8099 --directory build/wasm/site
+```
+
+Open `http://localhost:8099/`. Select teleop or autonomous in **Robot simulator**, choose the alliance, then enable. The browser starts disabled in unknown mode. Keyboard input controls driver port 0; a standard browser gamepad overrides it, and operator controls use port 1. Blur/hide disables the robot. The normal autonomous chooser and shoot-first delay retain the tuning paths below. For a 2D view, add `/Telemetry/Drive/Field/Robot` and `/Telemetry/Autonomous/Preview/path` to the field panel.
+
+The WASM-only boundaries provide:
+
+- Host-driven AdvantageKit lifecycle, synchronous receivers, generated input logs, metadata, and automatic outputs under `/AdvantageKit`; double-entry tuning and SDK Tunables use the shared in-process NT transport.
+- An NI Xbox command adapter that preserves the existing bindings without cross-wiring right sticks and triggers.
+- A resource-backed Choreo loader for all 16 packaged trajectories, using the pinned sample/event models and alliance transformations.
+- **No simulated vision observations**, by explicit design: the WASM PhotonVision IO shim reports disconnected, empty tag/pose arrays, and `/Telemetry/Vision/Simulation/Available = false`. Desktop PhotonVision simulation is unaffected. WASM pose estimation therefore uses wheel odometry without camera corrections.
+
+WASM does not provide native camera video, FMS match time/game messages, Conduit/system/radio/power/GC metrics, native alert aggregation, HAL replay, or URCL capture. Unavailable native measurements are omitted rather than fabricated. The consumer reflection metadata must be updated if the scanned robot object graph or automatic outputs change.
+
+The real WASM image passed 35,341 ticks (706.82 simulated seconds): both-alliance teleop, operator controls, all 23 automatic outputs, tuning writes, eight trajectory comparisons, fourteen later-phase autonomous runs, cancellation/transitions, and a 6 s shoot-first delay. Browser keyboard driving was also exercised. These checks do not validate vision, physical hardware, or deployment.
+
 ## Telemetry and autonomous selection
 
 Configuration uses Alpha 7 **Tunables** and outputs use **Telemetry**. Do not add the legacy SmartDashboard API or NetworkTables namespace. `Field2d` still resides in WPILib's historical `org.wpilib.smartdashboard` Java package; publishing it here uses Telemetry.
