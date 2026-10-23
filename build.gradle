@@ -2,7 +2,7 @@ plugins {
     id "java"
     id "application"
     id "org.wpilib.GradleRIO" version "2027.0.0-alpha-7"
-    id 'org.teamvan.wasmbot' version "0.1.0"
+    id 'org.teamvan.wasmbot' version "0.0.1"
 }
 
 java {
@@ -54,6 +54,13 @@ deploy {
 
 def deployArtifact = deploy.targets.systemcore.artifacts.wpilibJava
 
+// Rerun visualization SDK (moneyshift) is published to Maven Local from the FIRSTrun repo:
+//   cd ../FIRSTrun/moneyshift && ./gradlew :lib:publishToMavenLocal
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
 // Set to true to use debug for simulation including JNI.
 wpi.java.runSimWithDebugJni = false
 
@@ -85,6 +92,46 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Rerun streaming for the field/robot/plot visualization layer over NetworkTables.
+    // WASM builds exclude these jars (see the wasm source set configuration below).
+    implementation 'org.teamvan.moneyshift:lib:0.1.0'
+}
+
+// Mirror of the visualization dependency, resolved only to subtract it from the WASM classpaths.
+configurations {
+    rerunJars {
+        canBeConsumed = false
+        canBeResolved = true
+        transitive = true
+    }
+}
+
+dependencies {
+    rerunJars 'org.teamvan.moneyshift:lib:0.1.0'
+}
+
+// WASM has no Rerun: src/wasm/java shadows frc.robot.viz.RerunVisualizer, and the
+// moneyshift/NetworkTables JNI jars are removed from the image classpaths so native-image never
+// analyzes them.
+def wasmRerunExcludedClasspath = {
+    def wasmSourceSet = sourceSets.getByName('wasm')
+    def smokeSourceSet = sourceSets.getByName('wasmTest')
+    wasmSourceSet.compileClasspath = wasmSourceSet.compileClasspath.minus(configurations.rerunJars)
+    wasmSourceSet.runtimeClasspath = wasmSourceSet.runtimeClasspath.minus(configurations.rerunJars)
+    smokeSourceSet.runtimeClasspath =
+            smokeSourceSet.runtimeClasspath.minus(configurations.rerunJars)
+    // The native binaries captured the classpaths when the plugin was applied; re-point them.
+    def nativeExtension = extensions.getByName('graalvmNative')
+    nativeExtension.binaries.named('main') {
+        classpath.setFrom(wasmSourceSet.runtimeClasspath)
+    }
+    nativeExtension.binaries.named('smoke') {
+        classpath.setFrom(smokeSourceSet.runtimeClasspath)
+    }
+}
+afterEvaluate {
+    wasmRerunExcludedClasspath()
 }
 
 test {
@@ -92,6 +139,8 @@ test {
     // Robot/AdvantageKit/HAL singletons must not leak between integration-test classes.
     forkEvery = 1
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+    // Regression tests do not publish Rerun data by default; pass -Pviz=1 to publish.
+    systemProperty 'frc.robot.viz', (findProperty('viz') ?: '0')
 }
 
 // Simulation configuration (e.g. environment variables).

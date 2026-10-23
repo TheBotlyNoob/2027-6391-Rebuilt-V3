@@ -38,8 +38,9 @@ Current manifests declare Phoenix 6 `26.70.0-alpha-2`, REVLib `2027.0.0-alpha-8`
 - REAL uses Pigeon2 and Limelight. PhotonVision simulation is enabled with the pinned dev manifest from the GitHub Dev release; its matching source explicitly targets WPILib Alpha 7 and its JNI supports SystemCore. Do not relabel 2026 manifests as 2027.
 - SIM uses PhotonVision with the explicit 2026 REBUILT tag layout, existing rear camera transform, and an ideal 50 FPS, zero-noise, zero-latency camera. Camera motion comes from independent wheel odometry (`Drive.getSimulationPose`), never the vision-corrected pose. Single-tag solutions use a pose reference to disambiguate. The dev multi-tag solver produced an invalid planar solve during regression testing; simulated solves more than 0.5 in the translation-plus-heading reference metric are dropped and counted at `/Telemetry/Vision/Simulation/RejectedSolves`. This is a simulation-only workaround using known simulated motion, not a real-camera accuracy guarantee. Revisit it when upgrading PhotonLib or adding latency/noise.
 - Hood servos connect directly to SystemCore SmartIO PWM channels 0 and 1. `ShooterHoodIOServo` uses Alpha 7's `PWM` API, a 20 ms period, and the existing normalized angle mapping. Pulse endpoints are configurable in `ShooterConstants` (600–2400 microseconds); verify calibration with the installed servos.
+- Rerun visualization uses the `moneyshift` Java SDK (`org.teamvan.moneyshift:lib:0.1.0`) from the sibling FIRSTrun repository, resolved from Maven Local. Publish it with `cd ../FIRSTrun/moneyshift && ./gradlew :lib:publishToMavenLocal` before a clean build on a new machine. The SDK publishes plain NetworkTables topics under `/Rerun`; the Rust `rerun-importer-firstrun --nt` bridge turns them into Rerun chunks. There is no Arrow/gRPC/protobuf stack and no recording file, so no extra JVM flags are needed. Whether SystemCore's deploy JVM can reach the bridge is unverified; treat REAL-mode publishing as experimental.
 
-The Alpha 7 regression suite has thirteen automated tests. Tests cover coroutine cleanup/restart and bounded waits, deadline cancellation, trajectory markers, deployed path loading, simulation startup, SmartIO servo pulse mapping, simulator functionality, later autonomous phases on both alliances, shooter simulation requests/gain units, and actual PhotonVision tag observations with pose and timestamp validation. Hardware operation and deployment have not been verified.
+The Alpha 7 regression suite has fifteen automated tests. Tests cover coroutine cleanup/restart and bounded waits, deadline cancellation, trajectory markers, deployed path loading, simulation startup, SmartIO servo pulse mapping, simulator functionality, later autonomous phases on both alliances, shooter simulation requests/gain units, and actual PhotonVision tag observations with pose and timestamp validation, and the Rerun layer's `/Rerun` NetworkTables topics, static field flag, plots, state panel, and 2D-only scope. Hardware operation and deployment have not been verified.
 
 Verified Alpha 7 API changes:
 
@@ -62,10 +63,22 @@ Verified Alpha 7 API changes:
 - `subsystems/indexer`: TalonFX belt/kicker and REV SparkMax spinners.
 - `subsystems/shooter`: TalonFX flywheel, hood IO and distance lookup tables.
 - `subsystems/vision`: Limelight, PhotonVision simulation and QuestNav IO feeding drive pose estimation.
+- `viz`: the Rerun publishing layer, kept separate from AdvantageKit. `RerunVisualizer` owns the enable/rate logic and cadence, `FieldScene` the 2026 REBUILT 2D geometry and the selected auto path, `RobotScene` the footprint/heading/trail, aim target, and observed tags, and `DataScene` the plots/state panel/event log. `VizInputs` is the only surface robot code exposes to it, implemented by `RobotContainer`; scene classes take a flattened `VizFrame`.
 - `util`: Phoenix configuration helpers, logged tunables, and `V3Commands` coroutine recipes. Cancellation cleanup belongs in `Command.onCancel`/`whenCanceled`; an abandoned coroutine does not reliably unwind Java `finally` blocks.
 - `src/main/deploy`: runtime assets and autonomous paths.
 
 Preserve the IO pattern: hardware access belongs in hardware IO, physics in simulation IO, and robot behavior in subsystem/container/command code. Preserve all three runtime modes.
+
+## Rerun visualization
+
+The visualization layer records, it never drives. AdvantageKit remains the source of truth; do not move robot decisions or required telemetry into `viz`, and keep it fail-safe (it disables itself instead of throwing into the control loop).
+
+- Enable with `Visualization/RerunEnabled` (default on in SIM, off in REAL and REPLAY) and set the rate with `Visualization/RerunHz` (default 10 Hz). Both are `LoggedTunableNumber`s under `/Tuning`. `-Dfrc.robot.viz=0|1` overrides the switch; the regression tests force publishing off, and `./gradlew test ... -Pviz=1` turns it on for a run.
+- Nothing is written to disk. `NtRecorder` publishes under `/Rerun` on the default NetworkTables instance, and the viewer-side bridge (`rerun-importer-firstrun --nt --team 6391 --spawn`) turns the topics into Rerun chunks. Static field geometry is published on the first frame of a run.
+- The visualization is field-plane only: there is no 3D robot, mechanism, or camera model. Do not reintroduce `*3D` archetypes; keep new geometry in 2D.
+- The protocol carries one archetype per entity update, so credit plots as one entity per series (`plots/ShooterRPM/measured`, `plots/ShooterRPM/setpoint`). A single multi-series `SeriesLines` entity cannot also carry its `Scalars`.
+- Prefer fewer per-frame entities and keep expensive entities such as the pose trail at a low rate; every logged entity becomes one NetworkTables update that the bridge turns into a chunk.
+- Field, hub, trench, depot, zone, and AprilTag geometry come from `FieldConstants` and the loaded field layout. Chassis extents come from the swerve module locations.
 
 ## Working conventions
 
@@ -85,6 +98,7 @@ Preserve the IO pattern: hardware access belongs in hardware IO, physics in simu
 - Use GraalVM Java 25 Web Image, Binaryen, JSPI-capable Bun/browser, and an x64 MSVC developer environment. `nativeCompile`, `wasmRun`, `wasmSite`, and `advantagescope` are the consumer tasks; serve `build/wasm/site` over HTTP.
 - Host enable state and robot mode are separate. Omitted mode stays UNKNOWN. NI Xbox getters and command triggers must translate the normalized host layout without changing robot bindings or generic Gamepad behavior.
 - The user explicitly approved a no-observation WASM PhotonVision shim: disconnected camera, empty tag/pose arrays, and `Vision/Simulation/Available=false`. Desktop camera simulation remains real PhotonVision. Do not claim WASM camera validation.
+- Rerun publishing is intentionally unavailable in WASM. `src/wasm/java/frc/robot/viz/RerunVisualizer.java` shadows the desktop class with a no-op, and `build.gradle` subtracts the moneyshift/NetworkTables JNI jars from the wasm compile classpath, wasm runtime classpath, and both native binaries. Keep that exclusion in place when touching the dependency; do not claim WASM visualization.
 - Preserve generated AutoLog inputs, real explicit/automatic outputs, synchronous receiver delivery, nanosecond logger timestamps, and existing tuning/chooser protocols. Native Conduit/system/radio/power/GC metrics and native alert aggregation are unavailable; do not invent them. HAL replay and URCL reject use.
 - Choreo reads packaged `/wasmbot/deploy/choreo/*.traj` resources in WASM, preserving samples, forces, markers, splits, and library transforms. The 16 deploy assets remain the source of truth.
 - Reflection metadata covers the SIM object graph and private automatic outputs. Update it when those classes/members change. Report native compilation, actual CLI/browser behavior, desktop regressions, and hardware verification separately.

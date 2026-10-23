@@ -157,4 +157,13 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {}
+
+  /** Flushes the Rerun recording before the runtime shuts down. */
+  @Override
+  public void close() {
+    if (robotContainer != null) {
+      robotContainer.closeVisualizations();
+    }
+    super.close();
+  }
 }

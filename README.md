@@ -121,6 +121,27 @@ Simulation does not model obstacles, bumps, collected game pieces, or physical s
 
 Shooter simulation converts Phoenix velocity gains from rotations/sec to radians/sec and implements FOC requests through the voltage-based motor model. Hardware torque-current limits and bang-bang transients are not modeled. A regression test verifies spin-up and stopping rather than physical shot accuracy.
 
+## Visualization (Rerun)
+
+Each run can stream the 2026 REBUILT field, the robot footprint, the selected autonomous path, plots, and command/vision events to [Rerun](https://rerun.io). The moneyshift SDK only publishes plain NetworkTables topics under `/Rerun`; the Rust bridge turns them into Rerun chunks in real time, so nothing is written to disk on the robot:
+
+```sh
+rerun-importer-firstrun --nt --team 6391 --spawn
+```
+
+The robot view is 2D only: field boundary, zones, hubs, trenches, depots, and AprilTags, the swerve footprint with its heading and trail, the current aim target, and the tags the camera currently sees, plus plots, a state panel, and an event log. There is no 3D robot or mechanism model.
+
+Publishing is on by default in simulation and off on the real robot, and can be changed at runtime:
+
+| Tunable | Default | Meaning |
+| --- | --- | --- |
+| `/Tuning/Visualization/RerunEnabled` | 1 in SIM, 0 in REAL/REPLAY | Start or stop publishing |
+| `/Tuning/Visualization/RerunHz` | 10 | Publish rate |
+
+`-Dfrc.robot.viz=0|1` overrides the switch, and `./gradlew test --tests frc.robot.SimulationFunctionalTest -Pviz=1` publishes during a test run. WASM builds do not publish.
+
+The layer only reads robot state; AdvantageKit remains the log of record. Field, hub, trench, depot, zone, and tag geometry come from the real field layout and chassis size from the swerve module locations. Publishing from SystemCore is untested: the deploy JVM must be able to reach the NetworkTables server the bridge connects to.
+
 ## WASM browser simulation
 
 The published-local `org.teamvan.wasmbot` plugin runs the existing `first.Main` and `frc.robot.Robot` in SIM. Shared robot code, command bindings, physics IO, and desktop REAL/SIM/REPLAY selection are unchanged. Compatibility sources and reflection metadata are isolated in `src/wasm/`.
@@ -175,6 +196,7 @@ Choose the alliance before starting autonomous. Alliance-flipped paths refuse to
 | `subsystems/intake/`, `subsystems/indexer/` | Collection and feeding mechanisms |
 | `subsystems/shooter/` | Flywheel, hood, and distance-based shot settings |
 | `subsystems/vision/` | Limelight, PhotonVision simulation, and QuestNav IO |
+| `viz/` | Rerun publishing of the 2D field view, plots, state, and events over NetworkTables |
 | `generated/TunerConstants.java` | CTRE swerve configuration |
 | `src/main/deploy/` | Choreo paths and deployed assets |
 
@@ -188,6 +210,7 @@ REAL uses Pigeon2 and Limelight. Hood servos plug directly into SystemCore Smart
 | --- | --- |
 | WPILib / GradleRIO | `2027.0.0-alpha-7` |
 | Commands v3 | Official Alpha 7 `org.wpilib:commandsv3-java` artifact |
+| Rerun SDK (moneyshift) | `org.teamvan.moneyshift:lib:0.1.0` from Maven Local (FIRSTrun) |
 | Phoenix 6 | `26.70.0-alpha-2` |
 | REVLib | `2027.0.0-alpha-8` |
 | AdvantageKit | `27.0.0-alpha-6` |

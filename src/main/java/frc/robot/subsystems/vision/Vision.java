@@ -75,6 +75,22 @@ public class Vision implements Mechanism {
     return (Timer.getTimestamp() - lastTagSeenTimestamp) < 0.5;
   }
 
+  /** AprilTag IDs currently reported by any camera. Used by the visualization layer. */
+  public int[] getVisibleTagIds() {
+    int total = 0;
+    for (var input : inputs) {
+      total += input.tagIds.length;
+    }
+    int[] ids = new int[total];
+    int index = 0;
+    for (var input : inputs) {
+      for (int id : input.tagIds) {
+        ids[index++] = id;
+      }
+    }
+    return ids;
+  }
+
   /** Returns true if at least one camera is currently reporting as connected. */
   public boolean hasCameraConnected() {
     for (var input : inputs) {

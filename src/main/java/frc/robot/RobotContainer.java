@@ -73,11 +73,13 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.LoggedTunableNumber;
+import frc.robot.viz.RerunVisualizer;
+import frc.robot.viz.VizInputs;
 import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
-public class RobotContainer {
+public class RobotContainer implements VizInputs {
   // Drive modes
   public enum DriveMode {
     STANDARD,
@@ -109,6 +111,9 @@ public class RobotContainer {
 
   // Current drive mode
   private DriveMode currentDriveMode = DriveMode.STANDARD;
+
+  // Rerun recording (field/robot/mechanism/plot visualization); no-op in WASM builds
+  private final RerunVisualizer visualizer;
 
   public RobotContainer() {
     switch (Constants.currentMode) {
@@ -294,6 +299,9 @@ public class RobotContainer {
       autoChooser.addCmd(
           "Shooter FF Characterization", () -> Shooter.shooterFFCharacterization(shooter));
     }
+
+    // Constructed last so the VizInputs accessors see fully initialized subsystems
+    visualizer = new RerunVisualizer(this);
 
     configureButtonBindings();
   }
@@ -875,6 +883,70 @@ public class RobotContainer {
     return autoFactory;
   }
 
+  /** Flushes and closes the Rerun recording (called from {@link Robot#close()}). */
+  public void closeVisualizations() {
+    visualizer.close();
+  }
+
+  // ---------------------------------------------------------------------------------------------
+  // VizInputs: read-only view of the robot for the Rerun visualization layer
+  // ---------------------------------------------------------------------------------------------
+
+  @Override
+  public Drive drive() {
+    return drive;
+  }
+
+  @Override
+  public Vision vision() {
+    return vision;
+  }
+
+  @Override
+  public Intake intake() {
+    return intake;
+  }
+
+  @Override
+  public Indexer indexer() {
+    return indexer;
+  }
+
+  @Override
+  public Shooter shooter() {
+    return shooter;
+  }
+
+  @Override
+  public boolean redAlliance() {
+    return MatchState.getAlliance().orElse(Alliance.BLUE) == Alliance.RED;
+  }
+
+  @Override
+  public String driveMode() {
+    return currentDriveMode.name();
+  }
+
+  @Override
+  public String selectedAutoName() {
+    return autoChooser.selectedName();
+  }
+
+  @Override
+  public List<Pose2d> selectedAutoPath() {
+    return List.of(buildPreviewPoses(autoChooser.selectedName(), redAlliance()));
+  }
+
+  @Override
+  public boolean hubActive() {
+    return GameData.isHubActive();
+  }
+
+  @Override
+  public boolean hubActivatingSoon() {
+    return GameData.isHubActivatingSoon(5.0);
+  }
+
   Drive getDrive() {
     return drive;
   }
@@ -892,13 +964,14 @@ public class RobotContainer {
    * selection or alliance changes.
    */
   public void updateFieldVisualizations() {
+    visualizer.periodic();
     drive.publishField();
     String name = autoChooser.selectedName();
     boolean red = MatchState.getAlliance().orElse(Alliance.BLUE) == Alliance.RED;
     if (name.equals(lastPreviewName) && red == lastPreviewRed) return;
     lastPreviewName = name;
     lastPreviewRed = red;
-    autoPreviewField.getObject("path").setPoses(buildPreviewPoses(name));
+    autoPreviewField.getObject("path").setPoses(buildPreviewPoses(name, red));
     org.wpilib.telemetry.Telemetry.log("Autonomous/Preview", autoPreviewField);
   }
 
@@ -951,14 +1024,14 @@ public class RobotContainer {
     };
   }
 
-  private Pose2d[] buildPreviewPoses(String autoName) {
+  private Pose2d[] buildPreviewPoses(String autoName, boolean redAlliance) {
     var poses = new ArrayList<Pose2d>();
     for (TrajEntry e : buildPreviewEntries(autoName)) {
       Choreo.<SwerveSample>loadTrajectory(e.name())
           .ifPresent(
               traj -> {
                 var transformed = e.flip() ? traj.mirrorY() : traj;
-                if (lastPreviewRed) transformed = transformed.flipped();
+                if (redAlliance) transformed = transformed.flipped();
                 var samples = transformed.samples();
                 for (SwerveSample s : samples) {
                   poses.add(s.getPose());
